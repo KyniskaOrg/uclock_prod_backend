@@ -1,0 +1,91 @@
+const { Op } = require("sequelize");
+const { Employee } = require("../models");
+
+const createEmployee = async (req, res) => {
+  const { name, email } = req.body;
+
+  try {
+    // Check if the client already exists
+    const existingEmployee = await Employee.findOne({
+      where: { name, email },
+    });
+
+    if (existingEmployee) {
+      return res.status(400).json({ message: "employee already exists." });
+    }
+
+    // Create the client with or without clientId
+    await Employee.create({
+      name,
+      email // Set client_id to null if not provided
+    });
+
+    return res.status(201).json({ message: "Employee created successfully." });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error.", error });
+  }
+};
+
+const editEmployee = async (req, res) => {
+  const { employee_id, name } = req.body;
+
+  try {
+    // Find the employee by employee_id
+    const employee = await Employee.findOne({
+      where: { employee_id },
+    });
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found." });
+    }
+
+    // Update the employee's name
+    await employee.update({ name });
+
+    return res.status(200).json({ message: "Employee updated successfully." });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error.", error });
+  }
+};
+
+const getAllEmployees = async (req, res) => {
+  try {
+    // Get query parameters for pagination, sorting, and filtering
+    const { page = 1, sortBy, sortOrder, searchText, limit = 10 } = req.query;
+
+    // Pagination setup
+    //  // Default to 10 clients per page
+    const offset = (page - 1) * limit; // Calculate the offset based on the page
+
+    // Build where condition for filtering by clientName if provided
+    const whereCondition = searchText
+      ? { name: { [Op.iLike]: `%${searchText}%` } }
+      : {};
+
+    // Build the sorting condition
+    const order =
+      sortBy || sortOrder ? [[sortBy, sortOrder.toUpperCase()]] :  [["updatedAt", "DESC"]];;
+    // Fetch clients with pagination, sorting, and filtering
+    const employee = await Employee.findAndCountAll({
+      where: whereCondition,
+      limit: limit,
+      offset: offset,
+      order: order,
+    });
+
+    // Calculate total pages based on the count of clients and the limit
+    const totalPages = Math.ceil(employee.count / limit);
+
+    return res.status(200).json({
+      totalPages,
+      currentPage: parseInt(page),
+      totalEmployees: employee.count,
+      employees: employee.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+};
+
+module.exports = { createEmployee, getAllEmployees, editEmployee };
