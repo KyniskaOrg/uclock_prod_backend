@@ -322,6 +322,13 @@ const validateGetAllTimesheets = [
     .isEmpty()
     .withMessage("Date is required"),
 
+  query("end_date")
+    .isISO8601()
+    .withMessage("Date must be in the correct format (YYYY-MM-DD)")
+    .not()
+    .isEmpty()
+    .withMessage("end Date is required"),
+
   // Check for validation errors
   checkValidationErrors,
 ];

@@ -45,17 +45,14 @@ const getAllTimesheets = async (req, res) => {
     employee_id = [],
     project_id = [],
     start_date,
+    end_date,
     page = 1,
     limit = 10,
   } = req.query;
 
   // Parse the start_date (assuming the start_date is in 'YYYY-MM-DD' format)
   const startOfMonth = new Date(start_date);
-  startOfMonth.setDate(1); // Start of the month
-
-  const endOfMonth = new Date(startOfMonth);
-  endOfMonth.setMonth(startOfMonth.getMonth() + 1);
-  endOfMonth.setDate(0); // Last day of the month
+  const endOfMonth = new Date(end_date);
 
   try {
     // Construct where clause dynamically
