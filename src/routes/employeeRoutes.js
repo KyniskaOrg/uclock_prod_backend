@@ -1,21 +1,23 @@
 const express = require("express");
 const {
   createEmployee,
+  editEmployee,
   getAllEmployees,
-  editEmployee
+  deleteEmployee
 } = require("../controllers/employeeController");
 const {
   validateCreateEmployee,
   validateGetAllEmployees,
-  validateEditEmployee
+  validateEditEmployee,
+  validateDeleteEmployee
 } = require("../middlewares/bodyValidator");
 
 const router = express.Router();
 
 router.post("/createEmployee", validateCreateEmployee, createEmployee); // Create client
-router.get("/getAllEmployees", validateGetAllEmployees, getAllEmployees); // get clients list
 router.post("/editEmployee", validateEditEmployee, editEmployee); // Edit client
-
+router.post("/deleteEmployee", validateDeleteEmployee, deleteEmployee); // Edit client
+router.get("/getAllEmployees", validateGetAllEmployees, getAllEmployees); // get clients list
 
 module.exports = router;
 

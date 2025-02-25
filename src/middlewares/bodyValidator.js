@@ -48,6 +48,26 @@ const validateLogin = [
 ];
 
 // Employee creation validation rules
+const validateCreateEmployee = [
+  body("name")
+    .notEmpty()
+    .withMessage("Employee name is required")
+    .isLength({ min: 3 })
+    .withMessage("Employee name must be at least 3 characters long"),
+
+  body("email")
+    .isEmail()
+    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .optional()
+    .withMessage("Please provide a valid email address")
+    .normalizeEmail(),
+
+  body("position").optional().isString().withMessage("Position is required"),
+
+  checkValidationErrors, // Check for errors after validation rules
+];
+
+// Employee creation validation rules
 const validateEditEmployee = [
   body("name")
     .notEmpty()
@@ -64,22 +84,13 @@ const validateEditEmployee = [
   checkValidationErrors, // Check for errors after validation rules
 ];
 
-// Employee creation validation rules
-const validateCreateEmployee = [
-  body("name")
-    .notEmpty()
-    .withMessage("Employee name is required")
-    .isLength({ min: 3 })
-    .withMessage("Employee name must be at least 3 characters long"),
-
-  body("email")
-    .isEmail()
-    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-    .optional()
-    .withMessage("Please provide a valid email address")
-    .normalizeEmail(),
-
-  body("position").optional().isString().withMessage("Position is required"),
+// Employee deletion validation rules
+const validateDeleteEmployee = [
+  body("employee_id")
+    .isInt()
+    .withMessage("Employee ID must be an integer")
+    .not()
+    .optional(),
 
   checkValidationErrors, // Check for errors after validation rules
 ];
@@ -401,4 +412,5 @@ module.exports = {
   validateSetTimesheetRecord,
   validateDeleteTimesheetRecord,
   validateGetTimesheetCsv,
+  validateDeleteEmployee
 };

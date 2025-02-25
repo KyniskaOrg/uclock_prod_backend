@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Employee } = require("../models");
+const { Employee, Timesheet, sequelize } = require("../models");
 
 const createEmployee = async (req, res) => {
   const { name, email } = req.body;
@@ -48,6 +48,25 @@ const editEmployee = async (req, res) => {
   }
 };
 
+
+
+const deleteEmployee = async (req, res) => {
+  const { employee_id } = req.body;
+  const transaction = await sequelize.transaction();
+  
+  try {
+    await Timesheet.destroy({ where: { employee_id } }, { transaction });
+    await Employee.destroy({ where: { employee_id } }, { transaction });
+
+    await transaction.commit();
+    return res.status(200).json({ message: "Employee deleted successfully." });
+  } catch (error) {
+    await transaction.rollback();
+    return res.status(500).json({ message: "Server error.", error });
+  }
+};
+
+
 const getAllEmployees = async (req, res) => {
   try {
     // Get query parameters for pagination, sorting, and filtering
@@ -64,7 +83,7 @@ const getAllEmployees = async (req, res) => {
 
     // Build the sorting condition
     const order =
-      sortBy || sortOrder ? [[sortBy, sortOrder.toUpperCase()]] :  [["updatedAt", "DESC"]];;
+      sortBy || sortOrder ? [[sortBy, sortOrder.toUpperCase()]] : [["updatedAt", "DESC"]];
     // Fetch clients with pagination, sorting, and filtering
     const employee = await Employee.findAndCountAll({
       where: whereCondition,
@@ -88,4 +107,4 @@ const getAllEmployees = async (req, res) => {
   }
 };
 
-module.exports = { createEmployee, getAllEmployees, editEmployee };
+module.exports = { createEmployee, getAllEmployees,editEmployee,deleteEmployee };
