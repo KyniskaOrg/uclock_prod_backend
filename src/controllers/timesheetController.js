@@ -7,23 +7,28 @@ const {
 const { Op } = require("sequelize");
 
 const getTimesheet = async (req, res) => {
-  const { employee_id, project_id, start_date } = req.query;
-  // Parse the start_date (assuming the start_date is in 'YYYY-MM-DD' format)
+  const { employee_id, project_id, start_date, end_date } = req.query;
+
+  // Parse the start_date
   const startOfWeek = new Date(start_date);
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // End of the week (6 days after start date)
+  
+  // Use provided end_date or calculate a default one (6 days from start_date)
+  const endOfWeek = end_date ? new Date(end_date) : new Date(startOfWeek);
+  if (!end_date) {
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+  }
 
   let whereClause = project_id
     ? { employee_id: employee_id, project_id: project_id }
     : { employee_id };
   try {
-    // Query timesheets for the given employee and project for all days in the week (start_date to end_date)
+    // Query timesheets for the given employee and project within the date range
     const timesheets = await Timesheet.findAll({
       where: {
         ...whereClause,
         date: {
-          [Op.gte]: startOfWeek.toISOString().split("T")[0], // Start of week
-          [Op.lte]: endOfWeek.toISOString().split("T")[0], // End of week
+          [Op.gte]: startOfWeek.toISOString().split("T")[0], // Start date
+          [Op.lte]: endOfWeek.toISOString().split("T")[0],   // End date (provided or calculated)
         },
       },
       include: [

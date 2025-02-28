@@ -310,6 +310,12 @@ const validateGetTimesheet = [
     .isEmpty()
     .withMessage("Date is required"),
 
+  // Validate week start date
+  query("end_date")
+    .isISO8601()
+    .withMessage("Date must be in the correct format (YYYY-MM-DD)")
+    .optional({ nullable: true }),
+
   // Check for validation errors
   checkValidationErrors,
 ];
@@ -426,5 +432,5 @@ module.exports = {
   validateSetTimesheetRecord,
   validateDeleteTimesheetRecord,
   validateGetTimesheetCsv,
-  validateDeleteEmployee
+  validateDeleteEmployee,
 };
