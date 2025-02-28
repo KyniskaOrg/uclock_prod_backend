@@ -47,6 +47,19 @@ const validateLogin = [
   checkValidationErrors, // Check for errors after validation rules
 ];
 
+// Login validation rules
+const validateLoginEmployee = [
+  body("email")
+    .isEmail()
+    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .withMessage("Please provide a valid email address")
+    .normalizeEmail(),
+
+  body("password").notEmpty().withMessage("Password is required"),
+
+  checkValidationErrors, // Check for errors after validation rules
+];
+
 // Employee creation validation rules
 const validateCreateEmployee = [
   body("name")
@@ -400,6 +413,7 @@ const validateGetTimesheetCsv = [
 module.exports = {
   validateRegister,
   validateLogin,
+  validateLoginEmployee,
   validateCreateProject,
   validateGetAllProjects,
   validateCreateClient,

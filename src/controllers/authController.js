@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Employee } = require("../models");
 const { comparePassword, generateAuthToken } = require("../utils/auth");
 
 const loginUser = async (req, res) => {
@@ -38,4 +38,40 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser };
+const loginEmployee = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find the user by email
+    const employee = await Employee.findOne({
+      where: { email },
+    });
+    if (!employee) {
+      return res.status(400).json({ message: "Invalid credentials." });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const isPasswordValid = await comparePassword(password, employee.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Invalid credentials." });
+    }
+
+    // Generate a JWT token for the user
+    //role is null
+    const token = generateAuthToken(employee.id, null);
+    return res.status(200).json({
+      message: "Login successful",
+      token, // Send the token in the response
+      user: {
+        email: employee.email,
+        username: employee.name,
+        id: employee.employee_id,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error." });
+  }
+};
+
+module.exports = { loginUser, loginEmployee };
