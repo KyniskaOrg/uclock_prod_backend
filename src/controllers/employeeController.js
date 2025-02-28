@@ -7,7 +7,9 @@ const createEmployee = async (req, res) => {
   try {
     // Check if the client already exists
     const existingEmployee = await Employee.findOne({
-      where: { name, email },
+      where: {
+        [Op.or]: [{ name }, { email }]
+      }
     });
 
     if (existingEmployee) {
