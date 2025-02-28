@@ -61,17 +61,20 @@ mongoose.connect(
   }
 );
 
-//ssl setup
-Gl.init({
-  packageRoot: __dirname,
-  configDir: "greenlock.d",
-  debug: true,
-  // contact for security and critical bug notices
-  maintainerEmail: "ahmed@kyniska.eu",
-
-  // whether or not to run at cloudscale
-  cluster: false,
-})
-  // Serves on 80 and 443
-  // Get's SSL certificates magically!
-  .serve(app);
+// Check if running in local mode
+if (process.env.NODE_ENV === "local") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running locally on http://localhost:${PORT}`);
+  });
+} else {
+  // SSL setup only in non-local environments
+  const Gl = require("greenlock-express");
+  Gl.init({
+    packageRoot: __dirname,
+    configDir: "greenlock.d",
+    debug: true,
+    maintainerEmail: "ahmed@kyniska.eu",
+    cluster: false,
+  }).serve(app);
+}
