@@ -145,7 +145,7 @@ const generateNewTimesheetExcel = async (timesheetData) => {
       // Description: "",
       "Time(h)": entry.hours_worked,
       "Time(Decimal)": timeToDecimal(entry.hours_worked),
-      "Regular/Night":entry.work_type
+      "Regular/Night": entry.work_type,
     };
   });
 
@@ -153,16 +153,23 @@ const generateNewTimesheetExcel = async (timesheetData) => {
     const [hours, minutes] = timeString.split(":").map(Number);
     return (hours + minutes / 60).toFixed(2);
   }
+
+  function formatDate(date) {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
   // Write data
   let row = 2;
   Object.values(groupedData).forEach((data) => {
+    const formattedDate = formatDate(new Date(data["Date"]));
     ws.cell(row, 1).string(data["Project"]).style(headerStyle);
     ws.cell(row, 2).string(data["Employee"]);
-    ws.cell(row, 3).date(new Date(data["Date"]));
+    ws.cell(row, 3).string(formattedDate);
     ws.cell(row, 4).string(data["Time(h)"]);
     ws.cell(row, 5).string(data["Time(Decimal)"]);
     ws.cell(row, 6).string(data["Regular/Night"]);
-
 
     row++;
   });
