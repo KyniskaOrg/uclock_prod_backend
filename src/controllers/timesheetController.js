@@ -11,7 +11,7 @@ const getTimesheet = async (req, res) => {
 
   // Parse the start_date
   const startOfWeek = new Date(start_date);
-  
+
   // Use provided end_date or calculate a default one (6 days from start_date)
   const endOfWeek = end_date ? new Date(end_date) : new Date(startOfWeek);
   if (!end_date) {
@@ -28,7 +28,7 @@ const getTimesheet = async (req, res) => {
         ...whereClause,
         date: {
           [Op.gte]: startOfWeek.toISOString().split("T")[0], // Start date
-          [Op.lte]: endOfWeek.toISOString().split("T")[0],   // End date (provided or calculated)
+          [Op.lte]: endOfWeek.toISOString().split("T")[0], // End date (provided or calculated)
         },
       },
       include: [
@@ -53,6 +53,8 @@ const getAllTimesheets = async (req, res) => {
     end_date,
     page = 1,
     limit = 10,
+    sortBy = "date",
+    sortOrder = "ASC",
   } = req.query;
 
   // Parse the start_date (assuming the start_date is in 'YYYY-MM-DD' format)
@@ -75,10 +77,24 @@ const getAllTimesheets = async (req, res) => {
       whereClause.project_id = project_id;
     }
 
+    // Validate sortOrder
+    const validSortOrders = ["ASC", "DESC"];
+    const orderDirection = validSortOrders.includes(sortOrder.toUpperCase())
+      ? sortOrder.toUpperCase()
+      : "ASC";
+
+    // Determine sorting field
+    let order = [["date", orderDirection]]; // Default sorting by date
+
+    if (sortBy === "name") {
+      order = [[{ model: Employee, as: "Employee" }, "name", orderDirection]];
+    } else if (sortBy === "projectName") {
+      order = [[{ model: Project, as: "Project" }, "name", orderDirection]];
+    }
+
     // Calculate pagination values
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    console.log(whereClause);
     // Query timesheets based on the provided filters
     const timesheets = await Timesheet.findAndCountAll({
       where: whereClause,
@@ -86,7 +102,7 @@ const getAllTimesheets = async (req, res) => {
         { model: Employee, as: "Employee", attributes: ["name"] },
         { model: Project, as: "Project", attributes: ["name"] },
       ],
-      order: [["date", "ASC"]],
+      order, // Apply dynamic sorting
       limit: parseInt(limit),
       offset: offset,
     });
