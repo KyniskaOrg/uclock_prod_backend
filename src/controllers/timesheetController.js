@@ -186,18 +186,12 @@ const downloadTimesheetCsv = async (req, res) => {
     employee_id = [],
     project_id = [],
     start_date,
-    page = 1,
-    limit = 10,
-    detailed,
+    end_date,
   } = req.query;
 
   // Parse the start_date (assuming the start_date is in 'YYYY-MM-DD' format)
   const startOfMonth = new Date(start_date);
-  startOfMonth.setDate(1); // Start of the month
-
-  const endOfMonth = new Date(startOfMonth);
-  endOfMonth.setMonth(startOfMonth.getMonth() + 1);
-  endOfMonth.setDate(0); // Last day of the month
+  const endOfMonth = new Date(end_date);
 
   try {
     // Construct where clause dynamically
@@ -215,8 +209,6 @@ const downloadTimesheetCsv = async (req, res) => {
       whereClause.project_id = project_id;
     }
 
-    // Calculate pagination values
-    const offset = (parseInt(page) - 1) * parseInt(limit);
 
     // Query timesheets based on the provided filters
     const timesheets = await Timesheet.findAndCountAll({
@@ -225,15 +217,9 @@ const downloadTimesheetCsv = async (req, res) => {
         { model: Employee, as: "Employee", attributes: ["name"] },
         { model: Project, as: "Project", attributes: ["name"] },
       ],
-      order: [["date", "ASC"]],
-      limit: parseInt(limit),
-      offset: offset,
     });
 
-    const csvObject =
-      detailed === "true"
-        ? await generateTimesheetExcel(timesheets.rows, start_date)
-        : await generateNewTimesheetExcel(timesheets.rows);
+    const csvObject = await generateNewTimesheetExcel(timesheets.rows);
 
     return res.status(200).json(csvObject);
   } catch (error) {
