@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { Client } = require("../models");
 
-const createClient = async (req, res) => {
+const createClient = async (req, res, next) => {
   const { clientName } = req.body;
 
   try {
@@ -21,11 +21,11 @@ const createClient = async (req, res) => {
 
     return res.status(201).json({ message: "client created successfully." });
   } catch (error) {
-    return res.status(500).json({ message: "Server error.", error });
+    next(error)
   }
 };
 
-const getAllClients = async (req, res) => {
+const getAllClients = async (req, res, next) => {
   try {
     // Get query parameters for pagination, sorting, and filtering
     const {
@@ -65,8 +65,7 @@ const getAllClients = async (req, res) => {
       clients: clients.rows,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error", error });
+    next(error)
   }
 };
 

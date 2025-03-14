@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { Employee, Timesheet, sequelize } = require("../models");
 
-const createEmployee = async (req, res) => {
+const createEmployee = async (req, res, next) => {
   const { name, email } = req.body;
 
   try {
@@ -24,11 +24,11 @@ const createEmployee = async (req, res) => {
 
     return res.status(201).json({ message: "Employee created successfully." });
   } catch (error) {
-    return res.status(500).json({ message: "Server error.", error });
+    next(error)
   }
 };
 
-const editEmployee = async (req, res) => {
+const editEmployee = async (req, res, next) => {
   const { employee_id, name } = req.body;
 
   try {
@@ -46,13 +46,13 @@ const editEmployee = async (req, res) => {
 
     return res.status(200).json({ message: "Employee updated successfully." });
   } catch (error) {
-    return res.status(500).json({ message: "Server error.", error });
+    next(error)
   }
 };
 
 
 
-const deleteEmployee = async (req, res) => {
+const deleteEmployee = async (req, res, next) => {
   const { employee_id } = req.body;
   const transaction = await sequelize.transaction();
   
@@ -64,12 +64,12 @@ const deleteEmployee = async (req, res) => {
     return res.status(200).json({ message: "Employee deleted successfully." });
   } catch (error) {
     await transaction.rollback();
-    return res.status(500).json({ message: "Server error.", error });
+    next(error)
   }
 };
 
 
-const getAllEmployees = async (req, res) => {
+const getAllEmployees = async (req, res, next) => {
   try {
     // Get query parameters for pagination, sorting, and filtering
     const { page = 1, sortBy, sortOrder, searchText, limit = 10 } = req.query;
@@ -104,8 +104,7 @@ const getAllEmployees = async (req, res) => {
       employees: employee.rows,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error", error });
+    next(error)
   }
 };
 

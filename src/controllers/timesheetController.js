@@ -6,7 +6,7 @@ const {
 
 const { Op } = require("sequelize");
 
-const getTimesheet = async (req, res) => {
+const getTimesheet = async (req, res, next) => {
   const { employee_id, project_id, start_date, end_date } = req.query;
 
   // Parse the start_date
@@ -40,12 +40,11 @@ const getTimesheet = async (req, res) => {
     // Return the result
     return res.status(200).json(timesheets);
   } catch (error) {
-    console.error("Error fetching timesheet data:", error);
-    res.status(500).json({ error: "Failed to fetch timesheet data" });
+    next(error);
   }
 };
 
-const getAllTimesheets = async (req, res) => {
+const getAllTimesheets = async (req, res, next) => {
   const {
     employee_id = [],
     project_id = [],
@@ -119,7 +118,7 @@ const getAllTimesheets = async (req, res) => {
   }
 };
 
-const setTimesheetRecord = async (req, res) => {
+const setTimesheetRecord = async (req, res, next) => {
   const { employee_id, project_id, date, hours_worked, work_type } = req.body;
 
   try {
@@ -149,11 +148,11 @@ const setTimesheetRecord = async (req, res) => {
 
     res.status(200).json({ message: "Timesheet updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error saving timesheet data", error });
+    next(error);
   }
 };
 
-const deleteTimesheetRecord = async (req, res) => {
+const deleteTimesheetRecord = async (req, res, next) => {
   const { timesheet_ids } = req.body;
 
   try {
@@ -176,12 +175,11 @@ const deleteTimesheetRecord = async (req, res) => {
       message: `timesheet(s) deleted successfully.`,
     });
   } catch (error) {
-    console.error("Error deleting timesheet:", error);
-    return res.status(500).json({ error: "Failed to delete timesheet(s)" });
+    next(error);
   }
 };
 
-const downloadTimesheetCsv = async (req, res) => {
+const downloadTimesheetCsv = async (req, res, next) => {
   const {
     employee_id = [],
     project_id = [],
@@ -223,8 +221,7 @@ const downloadTimesheetCsv = async (req, res) => {
 
     return res.status(200).json(csvObject);
   } catch (error) {
-    console.error("Error fetching timesheet data:", error);
-    res.status(500).json({ error: "Failed to fetch timesheet data" });
+    next(error);
   }
 };
 

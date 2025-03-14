@@ -1,7 +1,7 @@
 const { User, Employee } = require("../models");
 const { comparePassword, generateAuthToken } = require("../utils/auth");
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -33,12 +33,11 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error." });
+    next(error);
   }
 };
 
-const loginEmployee = async (req, res) => {
+const loginEmployee = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -69,8 +68,7 @@ const loginEmployee = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error." });
+    next(error);
   }
 };
 

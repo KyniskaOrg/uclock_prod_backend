@@ -1,9 +1,10 @@
 require("dotenv").config();
 const express = require("express");
+require("./src/sentry")
 const Gl = require("greenlock-express");
+const commonMiddleware = require("./src/middlewares/commonMiddlewares");
+const errorHandler = require("./src/middlewares/errorMiddleware");
 const { sequelize } = require("./src/models");
-const bodyParser = require("body-parser");
-const cors = require("cors");
 const mongoose = require("mongoose");
 const passport = require("passport");
 require("./srcComplains/auth")(passport);
@@ -19,9 +20,7 @@ const clientRoutes = require("./src/routes/clientRoutes");
 const app = express();
 
 // Middleware setup
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+commonMiddleware(app)
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -47,7 +46,8 @@ sequelize
   .catch((err) => {
     console.error("Unable to connect to the database:", err);
   });
-
+  // custom error handler with sentry
+  errorHandler(app)
 // mongo  for complain setup
 mongoose.connect(
   process.env.mongo_url,
