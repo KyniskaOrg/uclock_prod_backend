@@ -4,7 +4,7 @@ const { body, query, validationResult } = require("express-validator");
 const checkValidationErrors = (req, res, next) => {
   const errors = validationResult(req); // Check for validation errors
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() }); // Return errors if validation fails
+    next({ errors: errors.array() }); // Return errors if validation fails
   }
   next(); // Continue to the next middleware/route handler if validation is successful
 };
@@ -274,11 +274,20 @@ const validateSetTimesheetRecord = [
 
   // Validate hours_worked
   body("hours_worked")
-    .isString()
-    .withMessage("Hours worked must be hhh:mm like formate")
-    .not()
-    .isEmpty()
-    .withMessage("Hours worked is required"),
+  .matches(/^([0-9]{1,2}):([0-9]{2})$/)
+  .withMessage("Hours worked must be in the format h:mm or hh:mm (numbers only, with a colon separator).")
+  .custom((value) => {
+    const [hours, minutes] = value.split(":").map(Number);
+    
+    if (hours > 24 || (hours === 24 && minutes > 0) || minutes > 59) {
+      throw new Error("Hours worked cannot be greater than 24:00.");
+    }
+
+    return true;
+  })
+  .not()
+  .isEmpty()
+  .withMessage("Hours worked is required"),
 
   body("work_type")
     .isIn(["night", "regular"])

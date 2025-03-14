@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { Project, Client } = require('../models');
 
-const createProject = async (req, res) => {
+const createProject = async (req, res, next) => {
   const { projectName, clientId } = req.body;
 
   try {
@@ -27,12 +27,12 @@ const createProject = async (req, res) => {
 
     return res.status(201).json({ message: 'Project created successfully.' });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error.', error });
+    next(error)
   }
 };
 
 
-const getAllProjects = async (req, res) => {
+const getAllProjects = async (req, res, next) => {
   try {
     // Get query parameters for pagination, sorting, and filtering
     const { page = 1, sortBy, sortOrder, searchText, limit=10 } = req.query;
@@ -71,8 +71,7 @@ const getAllProjects = async (req, res) => {
       projects: projects.rows,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Server error', error });
+    next(error)
   }
 };
 

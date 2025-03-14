@@ -1,7 +1,7 @@
 const { User } = require('../models');
 const { hashPassword } = require('../utils/auth');
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   const { username, email, password, role } = req.body;
 
   // Check if email or username already exists
@@ -22,8 +22,7 @@ const registerUser = async (req, res) => {
 
     return res.status(201).json({ message: 'User created successfully.' });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Server error.' });
+    next(error)
   }
 };
 
