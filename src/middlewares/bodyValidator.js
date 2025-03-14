@@ -418,9 +418,6 @@ const validateGetTimesheetCsv = [
     .not()
     .isEmpty()
     .withMessage("Date is required"),
-
-  // Validate week start date
-  query("detailed").isBoolean().withMessage("detailed must be a boolean"),
   // Check for validation errors
   checkValidationErrors,
 ];
