@@ -122,7 +122,7 @@ const setTimesheetRecord = async (req, res, next) => {
   const { employee_id, project_id, date, hours_worked, work_type } = req.body;
 
   try {
-    const existingTimesheet = await Timesheet.findOne({
+    let timesheet = await Timesheet.findOne({
       where: {
         employee_id,
         project_id,
@@ -130,14 +130,14 @@ const setTimesheetRecord = async (req, res, next) => {
       },
     });
 
-    if (existingTimesheet) {
+    if (timesheet) {
       // If timesheet entry exists, update it
-      existingTimesheet.hours_worked = hours_worked;
-      existingTimesheet.work_type = work_type;
-      await existingTimesheet.save();
+      timesheet.hours_worked = hours_worked;
+      timesheet.work_type = work_type;
+      await timesheet.save();
     } else {
       // If no entry exists, create a new one
-      await Timesheet.create({
+      timesheet = await Timesheet.create({
         employee_id,
         project_id,
         date,
@@ -145,8 +145,9 @@ const setTimesheetRecord = async (req, res, next) => {
         work_type,
       });
     }
-
-    res.status(200).json({ message: "Timesheet updated successfully" });
+    res
+      .status(200)
+      .json({ message: "Timesheet updated successfully", data: timesheet });
   } catch (error) {
     next(error);
   }
@@ -180,12 +181,7 @@ const deleteTimesheetRecord = async (req, res, next) => {
 };
 
 const downloadTimesheetCsv = async (req, res, next) => {
-  const {
-    employee_id = [],
-    project_id = [],
-    start_date,
-    end_date,
-  } = req.query;
+  const { employee_id = [], project_id = [], start_date, end_date } = req.query;
 
   // Parse the start_date (assuming the start_date is in 'YYYY-MM-DD' format)
   const startOfMonth = new Date(start_date);
@@ -206,7 +202,6 @@ const downloadTimesheetCsv = async (req, res, next) => {
     if (project_id.length) {
       whereClause.project_id = project_id;
     }
-
 
     // Query timesheets based on the provided filters
     const timesheets = await Timesheet.findAndCountAll({
