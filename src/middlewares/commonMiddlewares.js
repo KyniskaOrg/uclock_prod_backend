@@ -12,7 +12,7 @@ const commonMiddleware = (app) => {
   app.use(
     rateLimit({
       windowMs: 5 * 60 * 1000, // 5 minutes
-      max: 100, // Limit each IP to 100 requests per windowMs
+      max: 200, // Limit each IP to 200 requests per windowMs
       message: "Too many requests from this IP, please try again later.",
       headers: true, // Send rate limit info in headers
     })
