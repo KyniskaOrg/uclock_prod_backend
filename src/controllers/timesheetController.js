@@ -15,7 +15,7 @@ const getTimesheet = async (req, res, next) => {
   // Use provided end_date or calculate a default one (6 days from start_date)
   const endOfWeek = end_date ? new Date(end_date) : new Date(startOfWeek);
   if (!end_date) {
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6); // Use setUTCDate to avoid DST shifts
   }
 
   let whereClause = project_id
