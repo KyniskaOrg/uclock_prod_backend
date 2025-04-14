@@ -8,8 +8,8 @@ const createEmployee = async (req, res, next) => {
     // Check if the client already exists
     const existingEmployee = await Employee.findOne({
       where: {
-        [Op.or]: [{ name }, { email }]
-      }
+        [Op.or]: [{ name }, { email }],
+      },
     });
 
     if (existingEmployee) {
@@ -19,12 +19,12 @@ const createEmployee = async (req, res, next) => {
     // Create the client with or without clientId
     await Employee.create({
       name,
-      email // Set client_id to null if not provided
+      email, // Set client_id to null if not provided
     });
 
     return res.status(201).json({ message: "Employee created successfully." });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -46,28 +46,31 @@ const editEmployee = async (req, res, next) => {
 
     return res.status(200).json({ message: "Employee updated successfully." });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
-
-
 const deleteEmployee = async (req, res, next) => {
-  const { employee_id } = req.body;
+  const { employee_ids } = req.body;
   const transaction = await sequelize.transaction();
-  
+
   try {
-    await Timesheet.destroy({ where: { employee_id } }, { transaction });
-    await Employee.destroy({ where: { employee_id } }, { transaction });
+    await Timesheet.destroy(
+      { where: { employee_id: employee_ids } },
+      { transaction }
+    );
+    await Employee.destroy(
+      { where: { employee_id: employee_ids} },
+      { transaction }
+    );
 
     await transaction.commit();
     return res.status(200).json({ message: "Employee deleted successfully." });
   } catch (error) {
     await transaction.rollback();
-    next(error)
+    next(error);
   }
 };
-
 
 const getAllEmployees = async (req, res, next) => {
   try {
@@ -85,7 +88,9 @@ const getAllEmployees = async (req, res, next) => {
 
     // Build the sorting condition
     const order =
-      sortBy || sortOrder ? [[sortBy, sortOrder.toUpperCase()]] : [["updatedAt", "DESC"]];
+      sortBy || sortOrder
+        ? [[sortBy, sortOrder.toUpperCase()]]
+        : [["updatedAt", "DESC"]];
     // Fetch clients with pagination, sorting, and filtering
     const employee = await Employee.findAndCountAll({
       where: whereCondition,
@@ -104,8 +109,13 @@ const getAllEmployees = async (req, res, next) => {
       employees: employee.rows,
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
-module.exports = { createEmployee, getAllEmployees,editEmployee,deleteEmployee };
+module.exports = {
+  createEmployee,
+  getAllEmployees,
+  editEmployee,
+  deleteEmployee,
+};
