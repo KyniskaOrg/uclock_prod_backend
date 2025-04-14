@@ -99,8 +99,8 @@ const validateEditEmployee = [
 
 // Employee deletion validation rules
 const validateDeleteEmployee = [
-  body("employee_id")
-    .isInt()
+  body("employee_ids")
+    .isArray()
     .withMessage("Employee ID must be an integer")
     .not()
     .optional(),
