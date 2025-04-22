@@ -4,22 +4,28 @@ const {
   setTimesheetRecord,
   deleteTimesheetRecord,
   downloadTimesheetCsv,
-  getAllTimesheets
+  getAllTimesheets,
+  getMonthTotalHours,
 } = require("../controllers/timesheetController");
-//const {seedTimesheets} = require('../../seeders/timeSheetSeed');
+const { populateMonthTime } = require("../../seeders/MonthHourCalc");
 
 const {
   validateGetTimesheet,
   validateSetTimesheetRecord,
   validateDeleteTimesheetRecord,
   validateGetTimesheetCsv,
-  validateGetAllTimesheets
+  validateGetAllTimesheets,
+  validateGetMonthTotalHours,
 } = require("../middlewares/bodyValidator");
 
 const router = express.Router();
 
 router.get("/getTimesheetRecord", validateGetTimesheet, getTimesheet); // Create project
-router.get("/getAllTimesheetRecords", validateGetAllTimesheets, getAllTimesheets); // Create project
+router.get(
+  "/getAllTimesheetRecords",
+  validateGetAllTimesheets,
+  getAllTimesheets
+); // Create project
 
 router.post(
   "/setTimesheetRecord",
@@ -38,9 +44,12 @@ router.get(
   downloadTimesheetCsv
 ); // Create project
 
-// router.get(
-//   "/seed",
-//   seedTimesheets
-// ); // Create project
+router.get(
+  "/getMonthTotalHours",
+  validateGetMonthTotalHours,
+  getMonthTotalHours
+); // get Month total hours
+
+router.get("/seedmonthlyTimesheet", populateMonthTime); // Create project
 
 module.exports = router;

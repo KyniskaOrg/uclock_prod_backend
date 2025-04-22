@@ -274,20 +274,22 @@ const validateSetTimesheetRecord = [
 
   // Validate hours_worked
   body("hours_worked")
-  .matches(/^([0-9]{1,2}):([0-9]{2})$/)
-  .withMessage("Hours worked must be in the format h:mm or hh:mm (numbers only, with a colon separator).")
-  .custom((value) => {
-    const [hours, minutes] = value.split(":").map(Number);
-    
-    if (hours > 24 || (hours === 24 && minutes > 0) || minutes > 59) {
-      throw new Error("Hours worked cannot be greater than 24:00.");
-    }
+    .matches(/^([0-9]{1,2}):([0-9]{2})$/)
+    .withMessage(
+      "Hours worked must be in the format h:mm or hh:mm (numbers only, with a colon separator)."
+    )
+    .custom((value) => {
+      const [hours, minutes] = value.split(":").map(Number);
 
-    return true;
-  })
-  .not()
-  .isEmpty()
-  .withMessage("Hours worked is required"),
+      if (hours > 24 || (hours === 24 && minutes > 0) || minutes > 59) {
+        throw new Error("Hours worked cannot be greater than 24:00.");
+      }
+
+      return true;
+    })
+    .not()
+    .isEmpty()
+    .withMessage("Hours worked is required"),
 
   body("work_type")
     .isIn(["night", "regular"])
@@ -422,6 +424,41 @@ const validateGetTimesheetCsv = [
   checkValidationErrors,
 ];
 
+const validateGetMonthTotalHours = [
+  // Validate pagination - page should be an integer, defaulting to 1
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Page must be a positive integer")
+    .default(1),
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 200 })
+    .withMessage("Project Limit must be be 1-50"),
+  query("employee_id")
+    .isArray()
+    .withMessage("Employee ID must be an integer")
+    .not()
+    .optional(),
+  // Validate week start date
+  query("start_date")
+    .isISO8601()
+    .withMessage("Date must be in the correct format (YYYY-MM-DD)")
+    .not()
+    .isEmpty()
+    .withMessage("Date is required"),
+
+  query("end_date")
+    .isISO8601()
+    .withMessage("Date must be in the correct format (YYYY-MM-DD)")
+    .not()
+    .isEmpty()
+    .withMessage("end Date is required"),
+
+  // Check for validation errors
+  checkValidationErrors,
+];
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -439,4 +476,5 @@ module.exports = {
   validateDeleteTimesheetRecord,
   validateGetTimesheetCsv,
   validateDeleteEmployee,
+  validateGetMonthTotalHours,
 };

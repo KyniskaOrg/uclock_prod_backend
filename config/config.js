@@ -1,4 +1,4 @@
-require('dotenv').config(); // Load environment variables from .env file
+require("dotenv").config(); // Load environment variables from .env file
 
 module.exports = {
   development: {
@@ -6,6 +6,13 @@ module.exports = {
     password: process.env.DB_PASSWORD,
     database: process.env.DATABASE,
     host: process.env.DB_HOST,
-    dialect: "postgres"
-  }
+    dialect: "postgres",
+  },
+  local: {
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DATABASE,
+    host: process.env.DB_HOST,
+    dialect: "postgres",
+  },
 };
