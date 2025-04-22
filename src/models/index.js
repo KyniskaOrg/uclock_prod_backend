@@ -11,6 +11,7 @@ const models = {
   Project: require('./project')(sequelize, DataTypes),
   Team: require('./team')(sequelize, DataTypes),
   Client: require('./client')(sequelize, DataTypes),
+  MonthTime: require('./monthTime')(sequelize, DataTypes),
 };
 
 Object.keys(models).forEach((modelName) => {

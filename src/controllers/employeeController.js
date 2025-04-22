@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Employee, Timesheet, sequelize } = require("../models");
+const { Employee, Timesheet, sequelize, MonthTime } = require("../models");
 
 const createEmployee = async (req, res, next) => {
   const { name, email } = req.body;
@@ -60,6 +60,10 @@ const deleteEmployee = async (req, res, next) => {
       { transaction }
     );
     await Employee.destroy(
+      { where: { employee_id: employee_ids} },
+      { transaction }
+    );
+    await MonthTime.destroy(
       { where: { employee_id: employee_ids} },
       { transaction }
     );
