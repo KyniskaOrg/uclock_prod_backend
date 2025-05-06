@@ -247,6 +247,44 @@ const validateGetAllEmployees = [
   checkValidationErrors,
 ];
 
+const validateGetEmployeesWithNoEntry = [
+  // Validate pagination - page should be an integer, defaulting to 1
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Page must be a positive integer")
+    .default(1),
+
+  // Validate sortBy - should be one of the allowed fields
+  query("sortBy")
+    .optional()
+    .isIn(["name", "client_id"])
+    .withMessage('SortBy must be either "name" or "client_id"')
+    .default("name"),
+
+  // Validate sortOrder - should be either ASC or DESC
+  query("sortOrder")
+    .optional()
+    .isIn(["ASC", "DESC"])
+    .withMessage('SortOrder must be either "ASC" or "DESC"')
+    .default("ASC"),
+
+  // Validate projectName - optional but if provided, should be a string
+  query("searchText")
+    .optional()
+    .isString()
+    .withMessage("Project name must be a string"),
+
+  // Validate project limit
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 200 })
+    .withMessage("Project Limit must be be 1-50"),
+
+  // Check for validation errors
+  checkValidationErrors,
+];
+
 const validateSetTimesheetRecord = [
   // Validate employee_id
   body("employee_id")
@@ -255,6 +293,20 @@ const validateSetTimesheetRecord = [
     .not()
     .isEmpty()
     .withMessage("Employee ID is required"),
+
+  // Validate  start date
+  query("start_date")
+    .isISO8601()
+    .withMessage("Date must be in the correct format (YYYY-MM-DD)")
+    .not()
+    .isEmpty()
+    .withMessage("Date is required"),
+
+  // Validate  start date
+  query("end_date")
+    .isISO8601()
+    .withMessage("Date must be in the correct format (YYYY-MM-DD)")
+    .optional({ nullable: true }),
 
   // Validate project_id
   body("project_id")
@@ -477,4 +529,5 @@ module.exports = {
   validateGetTimesheetCsv,
   validateDeleteEmployee,
   validateGetMonthTotalHours,
+  validateGetEmployeesWithNoEntry,
 };

@@ -60,11 +60,11 @@ const deleteEmployee = async (req, res, next) => {
       { transaction }
     );
     await Employee.destroy(
-      { where: { employee_id: employee_ids} },
+      { where: { employee_id: employee_ids } },
       { transaction }
     );
     await MonthTime.destroy(
-      { where: { employee_id: employee_ids} },
+      { where: { employee_id: employee_ids } },
       { transaction }
     );
 
@@ -117,9 +117,59 @@ const getAllEmployees = async (req, res, next) => {
   }
 };
 
+const getEmployeesWithNoEntry = async (req, res, next) => {
+  try {
+    const {
+      start_date, // e.g., "2024-04-01"
+      end_date, // e.g., "2024-05-01"
+      page = 1,
+      limit = 10,
+      sortBy = "name",
+      sortOrder = "ASC",
+    } = req.query;
+
+    if (!start_date || !end_date) {
+      return res
+        .status(400)
+        .json({ error: "Start date and end date are required." });
+    }
+
+    const offset = (page - 1) * limit;
+    const order = [[sortBy, sortOrder.toUpperCase()]];
+
+    const employees = await Employee.findAndCountAll({
+      attributes: ["name", "employee_id"],
+      where: sequelize.literal(`
+        NOT EXISTS (
+          SELECT 1 FROM "Timesheets" t
+          WHERE t."employee_id" = "Employee"."employee_id"
+          AND t."date" >= '${start_date}'
+          AND t."date" < '${end_date}'
+        )
+      `),
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order,
+    });
+
+    const totalPages = Math.ceil(employees.count / limit);
+
+    return res.status(200).json({
+      totalPages,
+      currentPage: parseInt(page),
+      totalRecords: employees.count,
+      monthTime: employees.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching employees with no timesheet entries:", error);
+    next(error);
+  }
+};
+
 module.exports = {
   createEmployee,
   getAllEmployees,
   editEmployee,
   deleteEmployee,
+  getEmployeesWithNoEntry,
 };
