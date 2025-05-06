@@ -356,9 +356,6 @@ const getMonthTotalHours = async (req, res, next) => {
     if (employee_id.length) {
       whereClause.employee_id = employee_id;
     }
-    // if (project_id.length) {
-    //   whereClause.project_id = project_id;
-    // }
 
     // Validate sortOrder
     const validSortOrders = ["ASC", "DESC"];
@@ -371,8 +368,8 @@ const getMonthTotalHours = async (req, res, next) => {
 
     if (sortBy === "name") {
       order = [[{ model: Employee, as: "Employee" }, "name", orderDirection]];
-    } else if (sortBy === "projectName") {
-      order = [[{ model: Project, as: "Project" }, "name", orderDirection]];
+    } else if (sortBy === "hours_worked" || sortBy === "hours_worked_decimal") {
+      order = [["hours_worked", orderDirection]];
     }
 
     // Calculate pagination values

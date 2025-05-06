@@ -10,7 +10,7 @@ const loginUser = async (req, res, next) => {
       where: { email },
     });
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials." });
+      return res.status(400).json({ message: "User not found!" });
     }
 
     // Compare the provided password with the stored hashed password
@@ -18,10 +18,8 @@ const loginUser = async (req, res, next) => {
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
-
     // Generate a JWT token for the user
     const token = generateAuthToken(user.user_id, user.role);
-
     return res.status(200).json({
       message: "Login successful",
       token, // Send the token in the response
@@ -37,6 +35,7 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+
 const loginEmployee = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -46,7 +45,7 @@ const loginEmployee = async (req, res, next) => {
       where: { email },
     });
     if (!employee) {
-      return res.status(400).json({ message: "Invalid credentials." });
+      return res.status(400).json({ message: "Employee not found!" });
     }
 
     // Compare the provided password with the stored hashed password
