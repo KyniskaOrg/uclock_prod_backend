@@ -281,19 +281,6 @@ const validateGetEmployeesWithNoEntry = [
     .isInt({ min: 1, max: 200 })
     .withMessage("Project Limit must be be 1-50"),
 
-  // Check for validation errors
-  checkValidationErrors,
-];
-
-const validateSetTimesheetRecord = [
-  // Validate employee_id
-  body("employee_id")
-    .isInt()
-    .withMessage("Employee ID must be an integer")
-    .not()
-    .isEmpty()
-    .withMessage("Employee ID is required"),
-
   // Validate  start date
   query("start_date")
     .isISO8601()
@@ -307,6 +294,19 @@ const validateSetTimesheetRecord = [
     .isISO8601()
     .withMessage("Date must be in the correct format (YYYY-MM-DD)")
     .optional({ nullable: true }),
+
+  // Check for validation errors
+  checkValidationErrors,
+];
+
+const validateSetTimesheetRecord = [
+  // Validate employee_id
+  body("employee_id")
+    .isInt()
+    .withMessage("Employee ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Employee ID is required"),
 
   // Validate project_id
   body("project_id")
