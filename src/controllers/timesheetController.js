@@ -127,7 +127,7 @@ const setTimesheetRecord = async (req, res, next) => {
     supervisorId,
   } = req.body;
   
- {
+  try {
     let timesheet = await Timesheet.findOne({
       where: {
         employee_id,
@@ -144,7 +144,7 @@ const setTimesheetRecord = async (req, res, next) => {
       timesheet.work_type = work_type;
       timesheet.locked_by = supervisorId || null;
       
-      await updateMonthTime({ employee_id, oldHours, newHours, date });
+        await updateMonthTime({ employee_id, oldHours, newHours, date });
 
       await timesheet.save();
     } else {
