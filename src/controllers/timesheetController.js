@@ -1,7 +1,6 @@
 const { Timesheet, MonthTime, Project, Employee } = require("../models");
 const {
   generateNewTimesheetExcel,
-  generateTimesheetExcel,
 } = require("../resources/timesheetCsv/timesheetCsv");
 
 const { Op } = require("sequelize");
@@ -119,9 +118,16 @@ const getAllTimesheets = async (req, res, next) => {
 };
 
 const setTimesheetRecord = async (req, res, next) => {
-  const { employee_id, project_id, date, hours_worked, work_type } = req.body;
-
-  try {
+  const {
+    employee_id,
+    project_id,
+    date,
+    hours_worked,
+    work_type,
+    supervisorId,
+  } = req.body;
+  
+ {
     let timesheet = await Timesheet.findOne({
       where: {
         employee_id,
@@ -136,7 +142,8 @@ const setTimesheetRecord = async (req, res, next) => {
       const newHours = timeStringToFloat(hours_worked);
       timesheet.hours_worked = hours_worked;
       timesheet.work_type = work_type;
-
+      timesheet.locked_by = supervisorId || null;
+      
       await updateMonthTime({ employee_id, oldHours, newHours, date });
 
       await timesheet.save();
@@ -148,6 +155,7 @@ const setTimesheetRecord = async (req, res, next) => {
         date,
         hours_worked,
         work_type,
+        locked_by: supervisorId || null,
       });
       const newHours = timeStringToFloat(hours_worked);
       await updateMonthTime({

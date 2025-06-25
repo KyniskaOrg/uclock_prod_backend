@@ -35,7 +35,6 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-
 const loginEmployee = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -63,6 +62,7 @@ const loginEmployee = async (req, res, next) => {
       user: {
         email: employee.email,
         username: employee.name,
+        position: employee.position,
         id: employee.employee_id,
       },
     });
