@@ -220,10 +220,9 @@ const validateGetAllEmployees = [
   // Validate sortBy - should be one of the allowed fields
   query("sortBy")
     .optional()
-    .isIn(["name", "client_id"])
-    .withMessage('SortBy must be either "name" or "client_id"')
+    .isIn(["name", "client_id", "position"])
+    .withMessage('SortBy must be either "name", "client_id", or "position"')
     .default("name"),
-
   // Validate sortOrder - should be either ASC or DESC
   query("sortOrder")
     .optional()
@@ -348,6 +347,10 @@ const validateSetTimesheetRecord = [
     .withMessage('work_type must be either "night" or "regular"')
     .default("regular"),
 
+  body("employee_id")
+    .isInt()
+    .withMessage("Employee ID must be an integer")
+    .optional({ nullable: true }), // Make clientId optional
   // Check for validation errors
   checkValidationErrors,
 ];
@@ -511,6 +514,122 @@ const validateGetMonthTotalHours = [
   checkValidationErrors,
 ];
 
+validateSetEmployeePosition = [
+  body("employee_id")
+    .isInt()
+    .withMessage("Employee ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Employee ID is required"),
+
+  body("position")
+    .isString()
+    .withMessage("Position must be a string")
+
+    .withMessage("Position is required"),
+
+  checkValidationErrors, // Check for errors after validation rules
+];
+
+const validateCreateTeamGroup = [
+  body("teamName")
+    .notEmpty()
+    .withMessage("Team name is required")
+    .isLength({ min: 3 })
+    .withMessage("Team name must be at least 3 characters long"),
+
+  body("supervisor_id")
+    .isInt()
+    .withMessage("Supervisor ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Supervisor ID is required"),
+
+  checkValidationErrors, // Check for errors after validation rules
+];
+
+const validateGetAllTeamGroups = [
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Page must be a positive integer")
+    .default(1),
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 200 })
+    .withMessage("Project Limit must be be 1-50"),
+  query("sortBy").optional().isString().withMessage("SortBy must be a string"),
+  query("sortOrder")
+    .optional()
+    .isIn(["asc", "desc"])
+    .withMessage("SortOrder must be either 'asc' or 'desc'"),
+  query("searchText")
+    .optional()
+    .isString()
+    .withMessage("SearchText must be a string"),
+  query("supervisor_id")
+    .isInt()
+    .withMessage("Supervisor ID must be an integer"),
+
+  checkValidationErrors,
+];
+
+const validateAddEmployeeToTeamGroup = [
+  body("team_group_id")
+    .isInt()
+    .withMessage("Group ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Group ID is required"),
+
+  body("employee_ids")
+    .isArray({ min: 1 })
+    .withMessage("Employee IDs must be provided as an array")
+    .not()
+    .isEmpty()
+    .withMessage("Employee IDs are required"),
+
+  body("employee_ids.*")
+    .isInt()
+    .withMessage("Each employee ID must be an integer"),
+
+  checkValidationErrors, // Check for errors after validation rules
+];
+
+const validateGetAllTeamGroupsMembers = [
+  query("team_group_id")
+    .isInt()
+    .withMessage("Group ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Group ID is required"),
+];
+
+const validateRemoveEmployeeFromTeamGroup = [
+  body("team_group_id")
+    .isInt()
+    .withMessage("Group ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Group ID is required"),
+
+  body("employee_id")
+    .isInt()
+    .withMessage("Employee ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Employee ID is required"),
+];
+
+const validateDeleteTeamGroup = [
+  body("team_group_id")
+    .isInt()
+    .withMessage("Group ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Group ID is required"),
+];
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -530,4 +649,11 @@ module.exports = {
   validateDeleteEmployee,
   validateGetMonthTotalHours,
   validateGetEmployeesWithNoEntry,
+  validateSetEmployeePosition,
+  validateCreateTeamGroup,
+  validateGetAllTeamGroups,
+  validateAddEmployeeToTeamGroup,
+  validateGetAllTeamGroupsMembers,
+  validateRemoveEmployeeFromTeamGroup,
+  validateDeleteTeamGroup,
 };
