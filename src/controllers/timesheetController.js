@@ -323,6 +323,7 @@ const downloadTimesheetCsv = async (req, res, next) => {
     // Query timesheets based on the provided filters
     const timesheets = await Timesheet.findAndCountAll({
       where: whereClause,
+     order: [[{ model: Employee, as: "Employee" }, "name", "ASC"]],
       include: [
         { model: Employee, as: "Employee", attributes: ["name"] },
         { model: Project, as: "Project", attributes: ["name"] },
