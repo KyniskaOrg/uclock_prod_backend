@@ -151,7 +151,7 @@ const generateNewTimesheetExcel = async (timesheetData) => {
 
   function timeToDecimal(timeString) {
     const [hours, minutes] = timeString.split(":").map(Number);
-    return (hours + minutes / 60).toFixed(2);
+    return Number((hours + minutes / 60).toFixed(2));
   }
 
   function formatDate(date) {
@@ -168,7 +168,7 @@ const generateNewTimesheetExcel = async (timesheetData) => {
     ws.cell(row, 2).string(data["Employee"]);
     ws.cell(row, 3).string(formattedDate);
     ws.cell(row, 4).string(data["Time(h)"]);
-    ws.cell(row, 5).string(data["Time(Decimal)"]);
+    ws.cell(row, 5).number(data["Time(Decimal)"]);
     ws.cell(row, 6).string(data["Regular/Night"]);
 
     row++;
