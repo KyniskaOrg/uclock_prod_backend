@@ -136,17 +136,16 @@ const generateNewTimesheetExcel = async (timesheetData) => {
   });
   ws.column(1).setWidth(20);
   // Organize data by employee and project
-  let groupedData = {};
+  let groupedData = [];
   timesheetData.forEach((entry) => {
-    groupedData[entry.timesheet_id] = {
+    groupedData.push({
       Project: entry.Project.name,
       Employee: entry.Employee.name,
       Date: entry.date,
-      // Description: "",
       "Time(h)": entry.hours_worked,
       "Time(Decimal)": timeToDecimal(entry.hours_worked),
       "Regular/Night": entry.work_type,
-    };
+    });
   });
 
   function timeToDecimal(timeString) {
