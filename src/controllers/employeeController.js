@@ -36,7 +36,7 @@ const createEmployee = async (req, res, next) => {
 };
 
 const editEmployee = async (req, res, next) => {
-  const { employee_id, name } = req.body;
+  const { employee_id, name, email, phone, position } = req.body;
 
   try {
     // Find the employee by employee_id
@@ -48,8 +48,12 @@ const editEmployee = async (req, res, next) => {
       return res.status(404).json({ message: "Employee not found." });
     }
 
-    // Update the employee's name
-    await employee.update({ name });
+    await employee.update({
+      name: name || employee.name,
+      email: email || employee.email,
+      phone: phone || employee.phone,
+      position: position || employee.position,
+    });
 
     return res.status(200).json({ message: "Employee updated successfully." });
   } catch (error) {
