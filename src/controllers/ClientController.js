@@ -21,20 +21,14 @@ const createClient = async (req, res, next) => {
 
     return res.status(201).json({ message: "client created successfully." });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
 const getAllClients = async (req, res, next) => {
   try {
     // Get query parameters for pagination, sorting, and filtering
-    const {
-      page = 1,
-      sortBy,
-      sortOrder,
-      searchText,
-      limit = 10,
-    } = req.query;
+    const { page = 1, sortBy, sortOrder, searchText, limit = 10 } = req.query;
 
     // Pagination setup
     //  // Default to 10 clients per page
@@ -46,7 +40,8 @@ const getAllClients = async (req, res, next) => {
       : {};
 
     // Build the sorting condition
-    const order = sortBy||sortOrder?[[sortBy, sortOrder.toUpperCase()]]:[];
+    const order =
+      sortBy || sortOrder ? [[sortBy, sortOrder.toUpperCase()]] : [];
     // Fetch clients with pagination, sorting, and filtering
     const clients = await Client.findAndCountAll({
       where: whereCondition,
@@ -65,8 +60,64 @@ const getAllClients = async (req, res, next) => {
       clients: clients.rows,
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
-module.exports = { createClient, getAllClients };
+const deleteClient = async (req, res, next) => {
+  const { client_ids } = req.body;
+  console.log(client_ids);
+  try {
+    // Find the clients
+    const clients = await Client.findAll({
+      where: {
+        client_id: {
+          [Op.in]: client_ids,
+        },
+      },
+    });
+
+    if (!clients.length) {
+      return res.status(404).json({ message: "Clients not found." });
+    }
+
+    // Delete the clients
+    await Client.destroy({
+      where: {
+        client_id: {
+          [Op.in]: client_ids,
+        },
+      },
+    });
+
+    return res.status(200).json({ message: "Clients deleted successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateClient = async (req, res, next) => {
+  const { client_id } = req.body;
+  const { clientName } = req.body;
+
+  console.log(req.body);
+
+  try {
+    // Find the client
+    const client = await Client.findByPk(client_id);
+
+    if (!client) {
+      return res.status(404).json({ message: "Client not found." });
+    }
+
+    // Update the client
+    client.name = clientName;
+    await client.save();
+
+    return res.status(200).json({ message: "Client updated successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createClient, getAllClients, deleteClient, updateClient };
