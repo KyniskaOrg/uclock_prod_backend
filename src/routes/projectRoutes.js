@@ -17,6 +17,6 @@ const router = express.Router();
 router.post("/createProject", validateCreateProject, createProject); // Create project
 router.get("/getallProjects", validateGetAllProjects, getAllProjects); // Create project
 router.post("/editProject", validateEditProject, editProject); // Edit project
-router.post("/deleteProject", validateDeleteProject, deleteProject); // Delete project
+router.post("/deleteProject", validateDeleteProject, deleteProject); // Delete projects
 
 module.exports = router;
