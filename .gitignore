@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/greenlock.d
+greenlock.d
 package-lock.json
 yarn.lock
 
@@ -24,3 +26,5 @@ yarn.lock
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
