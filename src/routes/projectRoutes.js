@@ -2,14 +2,10 @@ const express = require("express");
 const {
   createProject,
   getAllProjects,
-  editProject,
-  deleteProject,
 } = require("../controllers/projectController");
 const {
   validateCreateProject,
   validateGetAllProjects,
-  validateEditProject,
-  validateDeleteProject,
 } = require("../middlewares/bodyValidator");
 
 const router = express.Router();

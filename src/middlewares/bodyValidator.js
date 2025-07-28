@@ -94,18 +94,6 @@ const validateEditEmployee = [
     .not()
     .optional(),
 
-  body("email")
-    .isEmail()
-    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-    .optional()
-    .withMessage("Please provide a valid email address")
-    .normalizeEmail(),
-  body("position").optional().isString().withMessage("Position is required"),
-  body("phone")
-    .optional()
-    .isString()
-    .withMessage("Please provide a valid phone number"),
-
   checkValidationErrors, // Check for errors after validation rules
 ];
 
@@ -642,64 +630,6 @@ const validateDeleteTeamGroup = [
     .withMessage("Group ID is required"),
 ];
 
-const validateDeleteClient = [
-  body("client_ids")
-    .isArray()
-    .withMessage("Client IDs must be provided as an array")
-    .not()
-    .isEmpty()
-    .withMessage("Client IDs are required"),
-
-  checkValidationErrors, // Check for errors after validation rules
-];
-
-const validateUpdateClient = [
-  body("clientName")
-    .notEmpty()
-    .withMessage("Client name is required")
-    .isLength({ min: 3 })
-    .withMessage("Client name must be at least 3 characters long"),
-  body("client_id")
-    .isInt()
-    .withMessage("Client ID must be an integer")
-    .not()
-    .isEmpty()
-    .withMessage("Client ID is required"),
-
-  checkValidationErrors,
-];
-
-const validateEditProject = [
-  body("projectName")
-    .notEmpty()
-    .withMessage("Project name is required")
-    .isLength({ min: 3 })
-    .withMessage("Project name must be at least 3 characters long"),
-  body("project_id")
-    .isInt()
-    .withMessage("Project ID must be an integer")
-    .not()
-    .isEmpty()
-    .withMessage("Project ID is required"),
-  body("client_id")
-    .optional({ nullable: true }) // Make clientId optional
-    .isInt({ min: 1 })
-    .withMessage("Client ID must be a positive integer"),
-
-  checkValidationErrors,
-];
-
-const validateDeleteProject = [
-  body("project_ids")
-    .isArray()
-    .withMessage("Project IDs must be provided as an array")
-    .not()
-    .isEmpty()
-    .withMessage("Project IDs are required"),
-
-  checkValidationErrors, // Check for errors after validation rules
-];
-
 module.exports = {
   validateRegister,
   validateLogin,
@@ -726,8 +656,4 @@ module.exports = {
   validateGetAllTeamGroupsMembers,
   validateRemoveEmployeeFromTeamGroup,
   validateDeleteTeamGroup,
-  validateDeleteClient,
-  validateUpdateClient,
-  validateEditProject,
-  validateDeleteProject,
 };
