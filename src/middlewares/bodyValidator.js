@@ -83,10 +83,10 @@ const validateCreateEmployee = [
 // Employee creation validation rules
 const validateEditEmployee = [
   body("name")
-    .notEmpty()
-    .withMessage("Employee name is required")
     .isLength({ min: 3 })
-    .withMessage("Employee name must be at least 3 characters long"),
+    .withMessage("Employee name must be at least 3 characters long")
+    .not()
+    .optional(),
 
   body("employee_id")
     .isInt()

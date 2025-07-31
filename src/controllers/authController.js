@@ -64,6 +64,7 @@ const loginEmployee = async (req, res, next) => {
         username: employee.name,
         position: employee.position,
         id: employee.employee_id,
+        phone: employee.phone,
       },
     });
   } catch (error) {
