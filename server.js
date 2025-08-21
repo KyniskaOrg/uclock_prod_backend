@@ -1,13 +1,17 @@
 require("dotenv").config();
 const express = require("express");
-require("./src/sentry")
+require("./src/sentry");
 const Gl = require("greenlock-express");
 const commonMiddleware = require("./src/middlewares/commonMiddlewares");
 const errorHandler = require("./src/middlewares/errorMiddleware");
 const { sequelize } = require("./src/models");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const serverAdapter = require('./src/bullUi/bullUi.js');
 require("./srcComplains/auth")(passport);
+
+// reddis
+const { createRedisClient } = require("./src/config/redis.js");
 
 // Import routes
 const authRoutes = require("./src/routes/authRoutes");
@@ -20,7 +24,9 @@ const clientRoutes = require("./src/routes/clientRoutes");
 const app = express();
 
 // Middleware setup
-commonMiddleware(app)
+commonMiddleware(app);
+
+// Initialize Redis client
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -37,17 +43,21 @@ app.use("/api/test", () => {
 // complain routes
 app.use(require("./srcComplains/routes"));
 
+// bull board setup
+app.use('/admin/queues', serverAdapter.getRouter());
+
 // Database connection
 sequelize
   .authenticate()
   .then(() => {
     console.log("Database connected successfully.");
+    createRedisClient();
   })
   .catch((err) => {
     console.error("Unable to connect to the database:", err);
   });
-  // custom error handler with sentry
-  errorHandler(app)
+// custom error handler with sentry
+errorHandler(app);
 // mongo  for complain setup
 mongoose.connect(
   process.env.mongo_url,
@@ -60,7 +70,6 @@ mongoose.connect(
     }
   }
 );
-
 // Check if running in local mode
 if (process.env.NODE_ENV === "local") {
   const PORT = process.env.PORT || 3000;
