@@ -406,6 +406,28 @@ const getMonthTotalHours = async (req, res, next) => {
   }
 };
 
+const updateProjectTimesheet = async (req, res, next) => {
+  const { project_id, timesheet_ids } = req.body;
+  console.log("Updating project timesheet:", { project_id, timesheet_ids });
+   try {
+      console.log("Updating project timesheet:", { project_id, timesheet_ids });
+    // Validate input
+    if (!Array.isArray(timesheet_ids) || timesheet_ids.length === 0) {
+      return res.status(400).json({ error: "Timesheet IDs must be provided as an array" });
+    }
+
+    // Update the project timesheet
+    await Timesheet.update(
+      { project_id },
+      { where: { timesheet_id: timesheet_ids } }
+    );
+
+    return res.status(200).json({ message: "Project timesheet updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getTimesheet,
   setTimesheetRecord,
@@ -413,4 +435,5 @@ module.exports = {
   downloadTimesheetCsv,
   getAllTimesheets,
   getMonthTotalHours,
+  updateProjectTimesheet
 };

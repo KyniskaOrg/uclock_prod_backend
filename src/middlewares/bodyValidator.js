@@ -166,7 +166,7 @@ const validateGetAllProjects = [
   // Validate project limit
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
 
   // Check for validation errors
@@ -214,7 +214,7 @@ const validateGetAllClients = [
   // Validate project limit
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
 
   // Check for validation errors
@@ -251,7 +251,7 @@ const validateGetAllEmployees = [
   // Validate project limit
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
 
   // Check for validation errors
@@ -289,7 +289,7 @@ const validateGetEmployeesWithNoEntry = [
   // Validate project limit
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
 
   // Validate  start date
@@ -407,7 +407,7 @@ const validateGetAllTimesheets = [
     .default(1),
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
   query("employee_id")
     .isArray()
@@ -465,7 +465,7 @@ const validateGetTimesheetCsv = [
     .default(1),
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
   query("employee_id")
     .isArray()
@@ -500,7 +500,7 @@ const validateGetMonthTotalHours = [
     .default(1),
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
   query("employee_id")
     .isArray()
@@ -568,7 +568,7 @@ const validateGetAllTeamGroups = [
     .default(1),
   query("limit")
     .optional()
-    .isInt({ min: 1, max: 200 })
+    .isInt({ min: 1, max: 2000 })
     .withMessage("Project Limit must be be 1-50"),
   query("sortBy").optional().isString().withMessage("SortBy must be a string"),
   query("sortOrder")
@@ -700,6 +700,24 @@ const validateDeleteProject = [
   checkValidationErrors, // Check for errors after validation rules
 ];
 
+const validateUpdateProjectTimesheet = [
+  body("project_id")
+    .isInt()
+    .withMessage("Project ID must be an integer")
+    .not()
+    .isEmpty()
+    .withMessage("Project ID is required"),
+
+  body("timesheet_ids")
+    .isArray({ min: 1 })
+    .withMessage("Timesheet IDs must be provided as an array")
+    .not()
+    .isEmpty()
+    .withMessage("Timesheet IDs are required"),
+
+  checkValidationErrors,
+];
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -730,4 +748,5 @@ module.exports = {
   validateUpdateClient,
   validateEditProject,
   validateDeleteProject,
+  validateUpdateProjectTimesheet
 };

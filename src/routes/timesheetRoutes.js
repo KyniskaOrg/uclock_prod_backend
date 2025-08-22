@@ -6,6 +6,7 @@ const {
   downloadTimesheetCsv,
   getAllTimesheets,
   getMonthTotalHours,
+  updateProjectTimesheet
 } = require("../controllers/timesheetController");
 const { populateMonthTime } = require("../../seeders/MonthHourCalc");
 
@@ -16,6 +17,7 @@ const {
   validateGetTimesheetCsv,
   validateGetAllTimesheets,
   validateGetMonthTotalHours,
+  validateUpdateProjectTimesheet
 } = require("../middlewares/bodyValidator");
 
 const router = express.Router();
@@ -51,5 +53,7 @@ router.get(
 ); // get Month total hours
 
 router.get("/seedmonthlyTimesheet", populateMonthTime); // Create project
+
+router.post("/updateprojectTimesheet", validateUpdateProjectTimesheet, updateProjectTimesheet); // Update project timesheet
 
 module.exports = router;
