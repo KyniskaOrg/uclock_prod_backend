@@ -139,8 +139,8 @@ const generateNewTimesheetExcel = async (timesheetData) => {
   let groupedData = [];
   timesheetData.forEach((entry) => {
     groupedData.push({
-      Project: entry.Project.name,
-      Employee: entry.Employee.name,
+      Project: entry.Project?.name || "N/A",
+      Employee: entry.Employee?.name || "N/A",
       Date: entry.date,
       "Time(h)": entry.hours_worked,
       "Time(Decimal)": timeToDecimal(entry.hours_worked),
